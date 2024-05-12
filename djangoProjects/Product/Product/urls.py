@@ -1,5 +1,5 @@
 """
-URL configuration for templateDemo project.
+URL configuration for Product project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -17,10 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from templateApp import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("firstTemplate",views.renderTemplate),
-    path("employeeInformation",views.employeeInfo),
 ]
