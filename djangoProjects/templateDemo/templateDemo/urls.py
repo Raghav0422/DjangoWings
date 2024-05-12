@@ -22,4 +22,5 @@ from templateApp import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("firstTemplate",views.renderTemplate)
+    path("employeeInformation",views.employeeInfo)
 ]
