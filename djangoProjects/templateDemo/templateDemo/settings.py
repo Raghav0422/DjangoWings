@@ -120,9 +120,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILE_DRS=[Path.joinpath(BASE_DIR,'static')], #here static is stacic folder name inside templateDemo
+STATICFILE_DIRS=[Path.joinpath(BASE_DIR,'static')], #here static is stacic folder name inside templateDemo
         # for OS
-        #STATICFILE_DRS=[os.path.join(BASE_DIR,'static')],
+        #STATICFILE_DIRS=[os.path.join(BASE_DIR,'static')],
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
