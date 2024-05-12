@@ -56,9 +56,7 @@ ROOT_URLCONF = "templateDemo.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS":[],
-        #random just to check if it works or not
-        # "DIRS": [Path.joinpath(BASE_DIR,'templates')],
+        "DIRS": [Path.joinpath(BASE_DIR,'templates')],
         # for OS
         #"DIRS":[os.path.join(BASE_DIR,'templates')],
         "APP_DIRS": True,
@@ -122,6 +120,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILE_DRS=[Path.joinpath(BASE_DIR,'static')], #here static is stacic folder name inside templateDemo
+        # for OS
+        #STATICFILE_DRS=[os.path.join(BASE_DIR,'static')],
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
