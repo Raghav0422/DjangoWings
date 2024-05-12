@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{%load static%}  #{%load staticfiles%} this is our old dajngo versions
 <html>
     <head>
         <title>
@@ -11,5 +12,6 @@
           <li>Id:{{id}}</li>
           <li>Salary:{{sal}}</li>
         </ol>
+        <img src="{%static "image/imagename.jpeg"%}"/>
     </body>
 </html>
