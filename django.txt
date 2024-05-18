@@ -1,0 +1,205 @@
+Django course,
+
+creating virtual environment before Django installation
+		py -m venv myworld
+	it will create virtual environment my world with files: include, lib, script, pyvnv.cng
+	
+Then you have to activate the environment, by typing this command:
+		myworld\Scripts\activate.bat
+
+Now install django
+		py -m pip install Django
+		
+
+CREATING Project
+*How to create project with CMD command in VS code
+		django-admin startproject smartnotes(
+	it is our folder/project name) .(dot indicates new project will be created in this location)
+	thiscommand creates two thing manage.py file and the smartnotes
+	*manage.py file is the enterance of the project
+	
+	go to the location of the file, and type 
+				python manage.py runserver
+	hit enter you will see the project runing django starting page
+	to run on different server enter port number at end
+				python manage.py runserver 77777
+
+*Next step is to create a django application inside django project
+	use command
+				python manage.py startapp firstApp (here firstApp is App name)
+			this command will create firstApp folder inside the django project name is smartnotes
+	
+*Next steps is we need to add this application under INSTALLED_APPS list in settings.py file inside project folder which is smartnotes
+
+Now time to create VIEWS, VIEWS creation in views.py
+
+	view is responsible for taking request and returning the response back
+	
+	There are two type of views:
+		Class based
+		Function based
+	
+	FUNCTION BASED VIEWS:
+		first we will import HttpResponse via below code:
+					from django.http import HttpResponse
+		below is the first function code:
+			def display(request):   #what request doing here? Browser will request something when click on some button or typing in webpage it will be stored in the request object
+				return HttpResponse("<h1>This is my first Django App!!!</h1>") # now views need to return something he will return HttpResponse
+				
+*Next step now view is created we will add the path in the urls.py inside the project
+		first we will import the views from the firstApp folder via
+					from firstApp import views
+		and after then we set a path(,) here first parameter contain the URL name and other views function like
+					path("hello/",views.display)
+			
+* Now we will create templates
+	what is templates? it is simple UI for the web browser, or inshort HTML code
+	first we make the templates folder in the Project smartnotes
+	and inside that folder we will create a subFolders or templease, like templateApp
+	
+* after creating templates folder its time to add in project settings.py
+	got to Template Directory check for base DIRS
+	and enter the below 
+			"DIRS":[os.path.join(BASE_DIR,'templates')],
+	
+*Next is to create a .html file in tempaltesApp folder
+			firstTemplate.html
+		just create a html file code script which you want to show in your web browser
+		
+*now got to the views.py of this project, to create a view
+	same as above but there is slight change in the template we dont required the HttpResponse to import as no use
+	render is already imported so we will use this
+			from django.shortcuts import render
+	now we will create a function(request) and return same what render is returning
+			def myFun(request):
+				return render(request, 'templateApp/firstTemplate.html')
+		this render is same as the imported render
+		two arguments, with first tell render as per the request come, and second what template to show
+		
+*now its time to configure the URL in urls.py for our new views for template
+	same process
+	
+*Lets learn something about templates in Django
+	As we know templates are the web apllication UI, it contains HTML code
+	now here we can use dynamic data which might come from the Views request how via double flower bracies
+			{{data}}
+	there is also DTL Django Templates Library, where we can use some tokens to work like JS or programming inside django html codes
+		Example:
+					{%csrf_token}
+					there is extends token to extends other template
+						{% x extends y %}
+					if condition:
+						{%Id condtition%}
+					ends with 
+						{%endif%}
+					same for for confition and end for
+	these all are come from the inbuild engine , you can check i settings Templates  BACKEND here is the written from where it come
+	
+*Now tranferring the data from the views to templates
+	It can be done  using render() function. as shwon earlier
+		render(requst,tempelate, data)
+	and template will show the data in currley braces or flower braces {{data}}
+	* one thing to rememmber data will pass in dictionary format\
+		below file in views.py
+				from django.shortcuts import render
+					def renderTemplate(request):
+						myDict={"name":"Raghav"}
+						return render(request, 'templateApp/firstTemplate.html', context=myDict)
+			here the context is just name parameter no need to enter you can simply pass the dictionary variable directly					
+		
+		below code in firstTemplate in HTML, 
+			we will simply write {{name}} and it will work in hrml file, nothing hard to do
+	
+	*ALWAYS REMEMMBER IF YOU HAVE CREATED NEW TEMPLATE IT MUST NEED TO BE ADD IN URLS.PY
+*CREATING STATIC files images css etc
+	so first we create a static folder inside our project
+		then inside a a image folder, and here all image files
+	*now need to made changes in settings.py inside project
+		here we will look for static and will add the static directory 
+		 so we will pick the DIRS from starting as same as templates we did above
+					STATIC_URL = "static/"
+					STATICFILE_DIRS=[Path.joinpath(BASE_DIR,'static')], #here static is stacic folder name inside templateDemo
+							# for OS
+							#STATICFILE_DIRS=[os.path.join(BASE_DIR,'static')],
+							
+		you can check if the file is loaded or not,. smiply we wnt to oue web page and after local host we will type
+				static/image/imagename.jpeg
+			as it is directly loading from the image and we have set the Static path in settings.py so no need to set i externaly on url.py
+				
+	after done with settings change, now time to add in the templates
+	we will open our template.html file whatever we have created or where we want to import it
+	we will use the template token which is
+			{%load static%}  #{%load staticfiles%} this is our old dajngo versions
+		and simply in html code we will add it, above code will load the files fropm the location like programing import
+			<img src="{%static "image/imagename.jpeg"%}"/>
+		thats all, 
+		
+	adding CSS folder 
+		simply create css folder inside static folder and then emp.css file
+		now link it in template folder same as we did for image and using css <link rel vali line
+					<link rel="stylesheet" href="{%static "css/emp.css"%}"
+		thats all
+		
+--------------------------------------------------------------------------------------------------------
+PRACTICE TIME
+	we will create a new project ,things you must done from above
+	1:creating a project:
+		django-admin startproject Products
+	2: creating application
+		python manage.py startapp Product
+	3: add this app stetings.py
+		go in INSTALLED_APPS and add the Product which is our application
+	4: create templates and static folder in project level
+			
+	5: add the template in settings.py
+		adding these folder is settings.py
+			how? simply check the base_directory path and add it
+			BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+			TEMPLATES_DIR=os.path.join(BASE_DIR,'templates')
+			STATIC_DIR=os.path.join(BASE_DIR,'static')
+		this seems to be slightly different as we have created variables in the settings.py and now adding these variables in
+		TEMPLATE and STATIC 
+			for TEMPLATE we will use
+				"DIR":[TEMPLATES_DIR]
+			
+			for STATIC we use
+				STATIC_DIR=[STATIC_DIR,]
+	6:
+		
+	
+
+	
+Django is based on MVT, (Model View Template design pattern)
+
+Q&A
+	Q: Public directive of Cache Control Header of HTTP response indicates that resource is cachable by any component.
+	Ans: true: Public directive indicates that resource is cachable by any component.
+	
+	Q: Which of the following is correct about URI in RESTful web services?
+	Ans: both
+		A - Each resource in REST architecture is identified by its URI.
+		B - Purpose of an URI is to locate a resource(s) on the server hosting the web service.
+
+	Q: Which of the following command should be used to create a Django Project?
+	Ans: django-admin startproject <project name>
+	
+	Q:Which of the following class is used to return a response  from a view function?
+	Ans: HttpResponse
+	
+	Q:The 'path' method used for configuring URLs is present in which of the following ?
+	Ans: django.urls
+	
+	Q: Which of the following commands is used to run the app?
+	Ans: python manage.py runserver
+	
+	Q1:Model in the MVT pattern is responsible for rendering the UI
+	Ans:False
+	
+	Q2: A Django Project can have more than one application
+	Ans: True
+	
+	Q3: Which of the following in MVT is responsible for doing the Database Work
+	Ans: Model
+	
+
+Note: first do the Commit & push via UI and then run this git commit -m "First commit" hit enter this will comit and to push use this "git push"
