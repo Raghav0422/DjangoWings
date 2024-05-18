@@ -1,0 +1,165 @@
+PYTHON training
+
+
+OOPS concept:
+	print(f"yo boi {thing}") its format string 
+	propert(get,set,del,doc) its get set value return the property of class
+	Decorator: Accept the function, enhance it and return it
+		isnu apaa @ naal represent krage, like	
+			@property
+			def fun(self):
+				code.....
+			@fun.setter
+			def fun(self, var):
+				code
+				
+		hun eh set krn lhge thle wala call hoyegaa
+		
+	
+MCQ PRACTICE
+	math.pow() this returns a floting value
+	so print(math.pow(3, 2)) answer will be 9.0 not 9	
+	
+THE RANDOM MODULE
+	Three Function
+		random(), randint(start ,end), randrange(start,end,gap or jump)
+	they are inside random module, we will import it 
+		import random
+	print(random.random()) # it will give output floating number 0.0 to 1.0
+	print(random.randint(1,5)) #it will give random number from 1 to 5 (1,2,3,4,5)
+	print(random.randrange(0,50,10))
+	
+	random.shuffle() is use to shuffle the list, return nothing no copy
+		shuffle() do not accept any mutable function like tuple string
+	copy.copy(anything) it will copy and return the object data
+	
+CHOICE AND SAMPLE Function
+	choice(iterable)
+		this function is use to get any value from the given iterable value, like list, tuple , dict, string
+		print(random.choice(["boo","baa","bee"]))
+		it can be any iterable variable
+	sample(iterable, how many numbers you want as sample)
+		it returns the list of element from the given data
+		random.sample([1,2,3,4,5,6],3)
+			this will return list of three in random
+			
+
+Regular Expression:
+	Regression is stored in re module
+			import re
+	we will use complie() method
+			re.compile('flower')
+		now this will create a pattern which fust have 6 letter and gmust be same sequence f l o w e r 
+		
+	how to check this, simply assign it to the variable: 
+			pattern=re.compile("flower")
+			match= pattern.search("myflower power") if matches it will return match else it return None
+			
+	and to check to which group it match we will use:
+			print(match.group()) gives the string name whereit is found
+			print(match.start()). index of starting point of regex
+			print(match.end()) giving ending index
+			print(match.span()), return (0,6) zero inclusively and 6 excuslively
+			
+			these function will work if the match is Match not None, so always loop in if like:
+					if match:
+	there are two methods
+		pattern.search("") : It search the pattern anywere in the string only first one
+		pattern.match(""): it search the pattern in the starting of the screen if not match then return, it will check the tsarting only not after that
+		pattern.findall(""): It returns the list of all the matching pattern, nomatter if it is combing between strings
+		for i in pattern.finditer(""):
+			print(i)   : it will return all the matching pattern there starting an ending index span list 
+			
+	So the \n and \t which are next line and the tab , both are special chgaracter so the Regex dont interpret we will add the raw string
+	a r or R in front of the string just to represent its raw string dont treat as special character
+			print(r"\t ki haal hai \n bsdk zinda hai")   chot teh vda r R dononchlnge
+			
+	Expression
+		\d all the digits from 0 to 9
+		\D opposite of \d, \D shows everything except 0-9 , everthing means everything like, space character etc
+				example: pattern = re.compile(r"\d") same for \D
+		\w matches any word character a-z A-Z 0-9 _
+		\W opposit of above , it will have space symbols etc
+		\s for white space chracter including line break and tab
+		\S non white space charater means all rest all 
+		\b it boundar character, to find the character at boundaries at starting of word or ending of word
+			ecamlle \bt that means words starts with t, t\b words end with tab
+		\B opposite look for character inside the word not at boundary
+			example \Bt evert character which not at beginning , t\B not at ending 
+		. it matches any character except the termination line by dot we mean anything
+			example e..o it means word starting with e and ending with o can contain any two character in between
+		\. its to search for the dot real dot
+		[] by bracket we means look for every character inside the bracket , no order no sequence just look for it
+			example [fwr] it will look for all the character f w r , [fwr] [rwf] [wrf] have the same meaning, if i simply write fwr it will look
+			for sequence fwr where [fwr] woill look for character f w and r
+			for range of character we use [a-lA-L] or [w-zW-Z]
+		^ carrot means not that 
+			example [^a-d] every character except abcd or a-d
+		{} currly bract=es is used to represent count,	
+			if i write z{3} it will search for word with continous three z like zzz
+			if i write z{3,} it will search for withe continous threez or more like zzz zzzzz zzzzzzzzzzzz
+			if i writezz(3,5) it for limit minimum three max four
+		+ by plus me means on or more appearance,
+			example s+, one or more s it is same as s{1,}
+		() pranthesis use to put or like a b chahiye yan b b chlega we will de (a|b)
+			example \d(a|b) ek digit uske badh koi b a or b 
+	
+
+Exception is error occure while program is running
+Traceback is summory of the log of the error
+TYPES OF ERROR
+	NameError: using the name which is not defined, using print(name), but th ename is not defined before its NameError
+	SyntaxError: when you make a typing mistake or typo 
+	TypeError: when an operation is applied to the two different type , addition of string and int, "5"+3 TypeError, or 5+"3" typeError
+	ValueError: when a function get value with right type but in appropriate value
+		write type but wrong value, like try conver string to int , int("xyz") ValueError xyz is not an int value, int("5") correct, "5" is correct type with value
+
+* Welcome to PYTHON
+	**Object String
+		Obeject is data structure or a way of storing digital information (its data type)
+	Intro to function:
+		Boolean:
+An Object is an Instance of Class
+Class is blueprint from which object is made
+Instance An object made from class
+
+Variable a name assigned to object
+
+Variable Naming Rules
+No spaces are allowed.
+
+The first character must be a letter (lowercase or uppercase) or an underscore.
+
+Only letters, numbers and underscores are permitted after the first character.
+
+Variable names are case-sensitive.name and Name are two distinct, separate variables.
+
+Variable names should describe the data that they are referencing.
+
+Use underscores to separate multiple words. This is called snake case style because the text resembles a snake.
+
+Example: my_favorite_flavor_of_ice_cream
+
+
+Q&A
+
+	Q: What casing should class names have?
+	Ans:CamelCase/PascalCase
+	Q: What error is raised if an argument is missing for an object instantiation?
+	Ans: TypeError
+	Q:What kind of error is raised if an empty list is passed to the choice function?
+	Ans: IndexError
+	Q1: What error will be raised by the code below?
+		float(print)
+	Ans: Its TypeError, A function is a completely invalid type to feed into the float function, which converts its argument to a floating point number.
+	
+	Q: What error will be raised by the code below?
+		int("3 eggs")
+	Ans:  ValueError: We're providing the int function the correct type (a string) but it has an inappropriate value.
+	
+	Q: What is a variable?
+	Ans: variable is a name or placeholder for an object.
+	
+	Q: What error will be raised with the following code?
+		float("Rocket")
+	Ans: ValueError ,A string of only text characters is an inappropriate value that the float function cannot convert to a decimal number.
