@@ -1,0 +1,303 @@
+MICROSERVICES
+
+DESIGNING MICROSERVICE AECHITECTIURE
+	ARCHITECTURE
+		Understand system requirement
+		understand non functional requirement
+		Map the component(main)
+			very important and must be look seriously
+			Mapping is done on the some factors, these are:
+			Business Requirement:
+				simple means is requirement of component as per business capabilities
+			Functional Autonomy:
+				maximum the functionality that does not involve the other business requirement
+				inshort working on one functionality will work one not external services need to be required
+			Data Entities:
+				One Id must be common between two data bases, like one order data there is only customer id, not customer information
+				to get the information we can
+			Data Autonomy:
+				underlying data must be an atomic data
+				means data doesnot depend on the other data for functionality, must be independentl
+			Exmaple:Ecommerce services
+				it has 
+								Inventory    			Orders     				customers    			payment
+				BR:				Manage Inv			Manage Order				Manage Customer			Perform payment
+				Functional: 	Add, remove,		Add, cancel,				Add, update,remove		Perform payment
+								update, quantity	calculate sum				get account details
+				Data Entity: 	Items				orders, shipping			customer address,		Payment HISTORY
+														address					contact details
+				Data Autonomy:	None				Relate to Item by Id		Relate to orders		None
+													relate to customerby Id			by Id
+			CASE SCENARIOS:
+				Case1: Retrieving all customer from NYC with all orders
+					there will be two things customer name and order,
+					and now to retrieve it will be complicated as this information is in two different database, and need to fetch two dB
+					Now it can be done in the three approaches:
+						Data Duplication:
+							here we will add the order ID in customer and the customer id in the order database
+						Service query:
+							running query logged to another, like one data is fetch then other query run for the database
+							if 100 matches in one database then the 100 queries will be executed
+						Aggregration service: 
+							it will create the third service, which will take the data from the two databases and then new database will
+							be createdm and the query is run in that content
+				Case2: Retrieve list of all orders in the system
+					microservices is not designed to retrive the gigas of data in single request
+					so we will check how we gona do, as in future there can be lot of data to be fetch in single query
+					to use we will check what is the purpose of this query
+			
+			Cross-cutting services:
+				this service provide system wide utilities:
+				like: logging, caching, user management these all must be the part of the mapping
+				
+		defining communication pattern:
+			Creating communication pattern between these services is very important, to choose the correct patterns'
+			Main patterns
+				1-to-1 sync:
+					this pattern waits for the other to respond, until do nothing just waits
+					Pros: immediate response, error handling, easy to implemented
+					Cons: performance
+					
+					here the service call the other services API (REST etc) directly, via maiking direct connection, like order connect with payment services
+					now if multiple services then creates like spider web, and if web it makes tough if one services url change it effect other services
+					it can be solved via Yellow page and gateway technique
+						Yellow page , service will request yellow page and yellow page will retuyrn the URL for the other service
+						Gateway: Url wen to gateway and then gateway wen to the requested service
+					
+				1-to-1 async:
+					service called other service and continue working
+					doesnot wait for response, 
+					service sent to the reciever and dont wait for the reply and after then its reciever duty to complete it, or check\
+									
+				Pub/sub Event driven:
+					service want to notiy something to other service
+					service just fire and forget and doesnot wait how many services listen, used mainly how many services want to notify
+					used mainly when a service want to notify other services about important event
+									
+		select the techonology track(main)
+			selecting technology means selecteing suitable platform for work, which will be efficient in all ways
+			Application development platform:
+				.net, .netCore, Java, node.js, php, python
+			Data store:
+				relational database, traditional database: like MS sql, Mysql postrgril
+				noSql database: no schemas database, like mnago DB, asure cosmos, couch base, amazon dynamos 
+					these databaseused when data is semistructired
+					
+				cache,stores in memory, distributes data across nodes, use proprietary, stores serializable objects
+					Application tool: redis
+					
+				object store:stores unstructured large data,
+					files, documents , photos
+					platform, MS azure blob storage (cloud based), amazon s3 , minio (platform based)
+		
+		Design the ARCHITECTURE(main)
+			it is based on layers paradigm
+			Represent horizontal functionality,
+				expose API -----> UI/Silo5pppppp5ppppppp 
+				Logics     -----> business logic layers
+				Database   -----> Data access layers
+		
+		write architecture document
+		Support the team
+		
+PROBLEM SOLVED BY MICROSERVICE
+	Single Techonology Platform:
+		This problem is solved by Decentralized governance attribute, 
+		we can use different platform for different services not depend upon common platform
+		
+	Inflexible Techonology Platform:
+		it is fixed by Componentiazition via services
+		it is based on loose coupling  and each component dont effect oter component
+		And also decentralized data management
+		every component has its own database
+		
+	Inefficent Compute Resources:
+		It is also splved by componentiaziton via services,
+		uses resourcesefficiently as per component requirement
+		
+	Large Complex:
+		it is fixed by Componentiazition via services
+			they have bounded code, not mixed with other code its independent code
+		And also decentralized data management\
+			sepearate database , no mixing of complicated database	
+		And Organized around business capabilities
+			No different team only single team
+	
+	Complicated and Expensive:
+		It uses smart endpoints and dumb/dump pipes
+		using smiple and well known API rest
+	
+	Lack of tooling:
+		Automation and tooling
+			there are automate tool which help to testing and deploymentfastly and rapidly
+	
+
+MICROSERVICE ARCHITECTURE or ATTRIBUTES
+	So as we know, problem with monolith and SOA led to new paradigm MICROSERVICE
+	we need something which is modular with simple API
+	Term microservices comes in 2011, main kick come after three year 2014, where Mertin and James lewis published first MServices article
+	
+	below important to understand rest can be read only
+		Componentiazition, Organized around business capabilities, Decentralized Governance, Decentralized data management, Infrastructure automations
+	
+	CHARACTERSTICS OF MICROSERVICE
+		1:Componentiazition via Services
+			main target to met the modularity (it means on component must not effect other component)
+			Modularity can be achieved using	
+				Library: hanji, normal library he, import krn vali, it will be easily imported and used lightining fast
+				Services: web service to make connection like web API, mostly Rest
+					monolith system made of component and every component has library, but we dont recommend
+					we use services Web Api, every component in microservices run independent process, but these component services
+					consist of libararies
+				each component ahs its own services and each service has its own Database
+			Motivation
+				every component can be deployed independently, one component not depend on other
+				services always provide well defined interface rather then Libraray, Service is good practice to define to others
+				
+		2:Organized around business capabilities
+			quick devlopment:
+				in monolith every team is different for things like UI, Apps , Database, Libraray'
+				but in microservices only one team handles all the things, and make it work, no need to connect with other team
+			well defined boundaries:
+				knows what to do as per the organization requirement, focus on only requirement
+				clearly knows what to do what not to do
+		
+		3: Products not Projects
+			short mai, we want to deliver a running Product not a running project or piece of code
+			so the developer must be aware about the customer need, via interacting or knowing, (in old services they dont rarely)
+			so they can deliver good product, it will increase customer statisfaction and Devlover motivation as well
+			
+		4: Smart Endpoints and Dumb pipes
+			short mai, it uses he simple protocol, while the SOA uses ESB which is complicated and has its own standard
+			MICROSERVICE uses exisiting web standards like Http
+			and it alsow expose one of most simpleaset API restAPI
+			
+		5: Decentralized Governance
+			Team is resposible for its services, as you build it you run it
+			as same team is working he will make optimal decision
+			Its platform independent can be written in Node.JS or JAVA as per requirement, due to loosely coupled
+			MultiDev platform is called Polygot
+			
+		6:Decentralized data management
+			In traditional system there is only one database. but in microservices every component has its own separate database
+			It is controversial, as having separate database for every componentt is not goo idea
+			And having it not always possible, 
+			raises problem like distributed transaction, duplicate data etc
+			only use when really required or demands
+			Still we use it As every data base is separate we have right tool for right information
+			isolated, so easy to maintain and change
+		
+		7:Infrastructure Automation
+			In old architecture testing done in software development life cycles take alot time
+			in microservices we use Automation , as short deployment cycle must
+			number of services can be tested manually 
+			Some automation tool are:
+				Azure devops , GITLAB, Jenkins
+		
+		8:Design for failure
+			It means the system can be crash due to high traffic and rather then stoping the all components to work we are ready for its
+			we will ready for failure
+			like if one of the link is broken or gone, rather then keep it down we will 
+				catch in the exception
+				or retry /retrive the connection between components
+				or  Log exception where developer can later use it
+			other thing we can use Monitoring tool , it will do is monitor all the components and check if any failure or anything
+			if yes it will through alert to check and fix
+			It increases system reliability 
+		
+		9: Evolutionary Design
+			moving from monolith to microservices should be gradual 
+			while moving start small and upgrade each part,
+	
+	
+Why Microservices?
+	Most popular architecture 
+	Not tied to spesified to one technology
+	solve real problem
+	in high demand in job market
+	Generate lots of Buzz
+
+Companies implemented by
+	Netflix, amazon, ebay, uber
+
+You must know before implementing Microservices Architecture
+	IF: is it good idea to moving to microservices in system
+	How: how to do that correctly
+	you must know when to use and when to not, else you will end up the system
+	Segement comapny used it and then get back to the traditional architecture  
+	
+PROBLEM WITH MONOLITH ans SOA
+	Single technology platform 
+		only one platform can be used, like all componentes must be in single platform, no different
+		this is not good thing
+		cant upgarde, future upgrade is problem
+	Infexible Deployment
+		if any changes need to be made in single component the whole application need to be deployed again
+		one code line change deploy whole project,
+		fix a bug in a component but B and C component get effected due to strong coupling, were it is nothing to do with A component
+		still need to test other two components, it increase the bug cycle 
+	Inefficent Computer resorces
+		are resources are divide equally to the components, weather they need it or not, 
+		in some case one component need more resources, we have to by extra resources for all the components
+		totally waste
+	Large and Complex for SOA
+		change in one component can cause to change in all component same as above
+	Complicated and Expensive ESB' for SOA
+		
+	Lack of Tooing for SOA
+
+HISTORY OF MICROSERVICES
+	Microservices is result of two architecture paradigm
+		Monolith
+		SOA (Service Oriented Architecture)
+	
+	MONOLITH:
+		Its original architecture, father of all software architecture
+		All software componentes executed in single process, large code will go in single process
+		No distribution, it may have large code, but it will use single thread, same memory, same system everthing, and not disclosed to any other
+			functionality
+		Strong coupling between classed, as its long code goes in siungle process it must have strong coupling with all classes
+		Usually implemented as Silo, 
+			like its live in his own world, no sharing with any other thing, no code , no data, no function nothing
+			no api, nothing means nothing can go out
+		
+		Monolith application example:
+			By Monolith application we real means is, it will enclosed in single process, working happily without anykind of distribution
+			as mentioned earlier, all software componentes will execute in single prcess
+			
+			HR APP and Purchase APp, (just example)
+			this application might have Database but is different process and Web application in different prcess running on different system
+			
+			Now you think want to communicate with HR app and Purchase app cant be done, Monolith menas not sharing SILO so cant done
+		
+		Pros:
+			Easier to design (no network, no messaging mechanism, no debugging , no queue, its simpler) , simpler is not always worse
+			Performance, (if design correctly)
+			
+	SOA SERVICE QRIENTED ARCHITECTURE:
+		built on 1998
+		Apps are services exposing functionality outside world
+		it is about sharing and giving
+		Usually implemented using SOAP and WSDL
+			SOAP: its protocol for webservices, its XML document
+			WSDL: is another XML document conatining metadata about the service,like:
+				which function it exposes,  what parameter they expect, and what data they return
+				
+		WSDL stands for Web Services Descriptive Language, whereas SOAP stands for Simple Object Access Protocol.
+		
+		Usually implementedwith ESB
+			its Enterprises service bus , user for cross connection, like routing authentication validation monitoring and more
+			
+		lets take and example of same HR app and purchse app, 
+			where in above Monolith they cant communicate, but with SOAP they can
+			using startup technology-agnosticprotocol, (supported by the majority of vendors)
+			Client will of to ESB bus, which is connected to both
+			client will request, request goes to ESB, ESB knows where is the service, and he will execute
+			client don need to know the services all he need to know is how to use ESB
+		
+		PROS:
+			Sharig Data & functionality (usinge EBS)
+			Polygot between services
+				means platform independent, they dont need to know what platform they are using
+				with the help of this first time Java Service can communicate to .net services 
+			
