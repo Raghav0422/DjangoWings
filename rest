@@ -1,0 +1,127 @@
+*API is Application programming interface
+*JSON, Java Script Object Notation, its a key value pair, Key: Value
+*RESTAPI, Representational state Transer
+
+
+JSON:
+	JSON stands for JavaScript Object Notation
+	JSON is a text format for storing and transporting data
+	JSON is "self-describing" and easy to understand
+	Both JSON and XML can be fetched with an XMLHttpRequest
+	XML has to be parsed with an XML parser. JSON can be parsed by a standard JavaScript function.
+	
+	Syntax:
+		Data is in name/value pairs
+		Data is separated by commas
+		Curly braces hold objects
+		Square brackets hold arrays
+	
+	Values:
+		a string a number an object an array a boolean null
+		
+	Functions:
+		A common use of JSON is to exchange data to/from a web server.
+		When receiving data from a web server, the data is always a string.
+			JSON.parse("string"), this function is use to convert the string into javascript object, 
+				here string will be the JSON string of name and value
+				The reviver parameter is a function that checks each property, before returning the value.
+				Convert a string into a date, using the reviver function:
+					const text = '{"name":"John", "birth":"1986-12-14", "city":"New York"}';
+					const obj = JSON.parse(text, function (key, value) {
+								  if (key == "birth") {
+									return new Date(value);
+								  } else {
+									return value;
+								  }
+								});
+					document.getElementById("demo").innerHTML = obj.name + ", " + obj.birth;
+		A common use of JSON is to exchange data to/from a web server.
+		When sending data to a web server, the data has to be a string.			
+			JSON.stringify(obj): use to convert object into JSON string
+		
+		
+	
+	File Types:
+		The file type for JSON files is ".json"
+		The MIME type for JSON text is "application/json", (MIME: Multipurpose Internet Mail Extensions)
+	
+	
+HTTP Server:
+	200: OK, work on Get, meanse entitty recieved, Post means entity created
+	201: Created, work in Post command
+	202: Accepted but not actioned, might be waiting in queue
+	204: No Content, process or updatio done but nothing return back, as large data might be 
+	207: Multi-Status code, used by webDAV , when multiple entitty shared some failed some succeeded ,
+	301: file or content might be it is moved to somewhere else dontknow
+	302: File moved i know where it is 
+	400series al from client responses
+	400: BAD request, Server cannot access, error
+	401: Unauthorised you are not allowed here, you are not authorised
+	403: Forbidden, server found the request, but he cant execute might be you dont have the Specific API key or something else you are restricted\
+	404: Not Found, nothing here you might enter wrong or something else
+	405: Your using wrong method, endpoint can only accept get method and you are using post method, and your method is incorrect
+	Server error:500
+	500: Internal server error, Server had problem and could not process the request
+
+
+
+REST API: Representational State Transfer=================================================
+	DEFINATION: REST API enables transfer of representation of resourse state
+	(basicaly client request for the resource state, and the server  return the response, in response it return the current state of resource
+	actually represtation of the state)
+	*Its a web API, 
+	*Its combination or URL+ JASON: user send URL and in response you will get JSON
+	*Client will request something and server will response the status ,
+	like server will return the state of the request, exmapl Client ask to delete the order 17 and the server will response with the state
+	of order Resource deleted, thats all state is transfere REST works hehehehe
+
+	**Structure of REST API Request
+			*Methods: means components of the rest like, GET,POST,PUT,Delete
+			*URL: Location of resources and parameters
+			*Headers: request meta data like User agent, authorization etc
+			*Body: It contain the content of the request (its optional)
+
+	**Structure of REST API Response
+			*Status code: It tells wether the request is succeded or not 200(success), 404 (Not Found)etc
+			*Header: Meta data of the response
+			*Body: content of the response(optional)
+			
+	FOR rest API documentation we use OpenAPI former name Swagger
+		OpenAPI can be used:
+			Provide documemtation  and test bed for developers
+			generates client library
+			generate the APi (design first)
+			can be automatically generated
+			compatible with many API platform
+			
+
+RESPONSE CODE
+	server return the request with response code like 200, 200 etc
+	from the responsecode we check 
+	Is it succeed ?
+	If not then why?
+	
+	RESPONSE GROUP
+		1xx for information only
+		2xx success,
+		3xx Redirection
+		4xx Client Error
+		5xx Server Error
+		for description check the above server
+			
+API Types: four main types of API===================================================================
+	Operating system API: every application need some kind of services , like a file application want to accee th file and application ask services
+		from the OS and how he gonna provide it? via using the OS API, like application required network devices to access . application will ask services from the OS 
+		and OS API will provide the services,
+			  *most common API in OS is win32 API
+		  
+	Library API: As we know in today programming all application use the library, called as user library, now user library want to 
+		connect with loggin library in system, How it will happen, login library will expose a API, with the help of this API user library 
+		will connect with the loggin api
+
+	Remote API: you want to connect with two components , user component and order component, wuser component will have Order proxy where he 
+		contain all the information of the order component how to reach there its path value and other thing, the use proprietary prtocol, 
+		but these two components user and the order component must have the same platfor, if one is ruuning on DCO or .Net or JAVA RMI other ust be same
+	Web API: simple its just conversation between two API, like think My API wants to talk with Weather API< then weather API expose his API
+		and My Api will use some standards to access this API , any platform , any language , no matter what he can comunicate
+
