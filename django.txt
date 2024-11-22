@@ -5,16 +5,26 @@ creating virtual environment before Django installation
 	it will create virtual environment my world with files: include, lib, script, pyvnv.cng
 	
 Then you have to activate the environment, by typing this command:
-		myworld\Scripts\activate.bat
+		myworld\Scripts\activate.bat (mworld is name of the environment)
 
 Now install django
 		py -m pip install Django
+		
+INstall RestFramework
+	pip install djangorestframework
+		in my case below not work
+	py -m pip install djangorestframework
 		
 
 CREATING Project
 *How to create project with CMD command in VS code
 		django-admin startproject smartnotes(
 	it is our folder/project name) .(dot indicates new project will be created in this location)
+	i have tried above but not work, in my case command work is 
+		python -m django startproject smartnotes
+		or 
+		py -m django startproject smartnotes
+		
 	thiscommand creates two thing manage.py file and the smartnotes
 	*manage.py file is the enterance of the project
 	
@@ -89,14 +99,14 @@ Now time to create VIEWS, VIEWS creation in views.py
 					there is extends token to extends other template
 						{% x extends y %}
 					if condition:
-						{%Id condtition%}
+						{%If condtition%}
 					ends with 
 						{%endif%}
-					same for for confition and end for
-	these all are come from the inbuild engine , you can check i settings Templates  BACKEND here is the written from where it come
+					same for condition and end for
+	these all are come from the inbuild engine , you can check in settings Templates  BACKEND here is the written from where it come
 	
 *Now tranferring the data from the views to templates
-	It can be done  using render() function. as shwon earlier
+	It can be done  using render() function. as shown earlier
 		render(requst,tempelate, data)
 	and template will show the data in currley braces or flower braces {{data}}
 	* one thing to rememmber data will pass in dictionary format\
@@ -145,6 +155,8 @@ PRACTICE TIME
 	we will create a new project ,things you must done from above
 	1:creating a project:
 		django-admin startproject Products
+		or
+		py -m django startproject smartnotes
 	2: creating application
 		python manage.py startapp Product
 	3: add this app stetings.py
@@ -163,12 +175,323 @@ PRACTICE TIME
 				"DIR":[TEMPLATES_DIR]
 			
 			for STATIC we use
-				STATIC_DIR=[STATIC_DIR,]
-	6:
+				STATICFILES_DIRS=[STATIC_DIR]
+	
+	6: Now we will create folder productApp inside  template folder and inside it index.html
+		here we will declare three card, electropnic shoes and toys as list ul
+			dont forget to load static via code in begining
+				{%load staticfiles%}
+			NOt worked so i used below
+				{%load static%}
+				
+		Point to remember when loading css or image inside the html file we will use href or src in {%%} this braces
+		like:
+			<link rel='stylesheet' type='text/css' href="{% static 'css/product.css'%}">
+		here static is the folder, css is another folder inside static and product.css is file	
 		
 	
-
+	7: now create new file inside template product app folder called it products.html
+		this file will be our dynamic file, for all the three templates, electronics, toys and shop
+		now here we will fetch data from views via {{}} thos double curley braces
+			and dont forget to load static file
 	
+	8:now its time to create views in views.py inside app which is product.app
+		separate function for each electronic toys and shoes
+		and return render with three parametrs one is returning request, template name and context (context will be dictionary variable name)
+		and we will add here a default views, which will return when we ahve default 8000
+						def index(request):
+							return render(request,'productsApp/products.html')
+	
+	9:now add the views in urls.py of the project which is product		
+
+---------------------------------------
+MODEL CREATION AND LEARNING TIME
+	you know that already, what is model its just the data variable deceleration page, where we declare the variable 
+	variable= charfield type 
+	every model is new database in the project, 
+	and every class in the model is field in database
+		
+	Steps creating model:
+		create project:
+		configure database
+		create model class
+		make migration > Migrate
+		Use the model in view
+			
+	Now lets create new project and app project name will be Model and app name will be Modelapp
+		this time do in yourself and dont forget to register app in setting .py
+	Now its time for database setup in settings.py as model is all about data
+		so in datbase inside settings.py, already database is declared, so all we need to use it (here talking about sqlite DB)
+		if you can you can declare your own for oracle, password etc will be required
+		
+	-----DATABASE CONNECTION TESTING------------------	
+		so just to check if database connection is established or not we will check in python shell
+			python manage.py shell
+				from django.db import connection
+				c=connection.cursor()
+			if above code executed without error that means you will be able to use database connectivity of sql lite
+			
+	Now My Sql connection with database
+		simple in the place of sqlite3 we will use mysql for Engine variable
+		and NAME: emplyeedb (it is database name) before that it was the database path name for mysqlite 
+		USER: root
+		PASSWORD: jo b aapka 
+		
+	All configuration done now its time for Model creation
+		import models from django.db
+		simple thing just create the class anyname and then extends with models.MODEL
+		once done now its class body time here we will declare variable and there type from models object
+			example:
+				firstname= models.CharField(max_length=30)
+	
+	Now model is created its time to convert it to DB table
+		simple table content already set in model,
+		so we will run command
+				python manage.py makemigrations
+			it will create model query with same name as your class name in model.py here i am using Employee
+			from this command we means simply create query for the table we will gona create in database
+			and this command will create a file inside migration like 001
+			
+		so if you want to check which sql command/query will run you can check via below command
+				python manage.py sqlmigrate ModelApp(its my application name in django) 001 (its migration field name)
+			this command will give you the SQL query which we gona perform
+			
+		and then we will run another command, this command is for running the query which is created via makemigrations
+				python manage.py migrate
+			this command tells that push the table or create table in the database (different things)
+			
+	Now we will add the model in views, or we will create views for model
+		first import the Employee (this is Model function name which we have craeted in the model.py)
+				from ModelApp.models import Employee
+		then create function with request as arguments
+		declare a variable which hold all object data	
+				employee=Employee.object.all()
+		and then creat a dictionary which hold employees data
+				empDict={'employees': employee}
+		and now return 
+				return render(request,"ModelApp/employees.html",empDict)
+								OR
+				return render(request,"employees.html",empDict)
+		
+	Now time to create template inside ModelApp
+		first thing declaring template path directory
+		for that command is:
+				TEMPLATE_DIRS=os.path.join(BASE_DIR,'template') (yanha jo template name hai na must be equal to folder name 
+																		template tu smj gyaa)
+		and template folder inside project and inside that create html file
+				
+	Now file creation is done, templates created and now add that templates in views (for this project already done)
+	
+	and then URL.py add the views and the link in urls.py path
+	
+	now add the information table, via SQL or My SQL to fetch data
+	
+	WORKING:
+		model.py just for model structure, here variable declartion is main as we will use this, and class name is your table name 
+		in views we will fetch the objectes in model.py via function
+				employee=Employee.object.all() (here Employee is class name in model.py)
+			after then we will create a dictionary with key and value, for employee var which we declare above
+		and then return the render	
+				return(request,templatefile path,dictionary variable)
+		now setup the template.html with your code and design
+			here {{}} is used for variable or value printing and {%%} is used for python tags like if loop etc.
+			if endif, for end for, with endwith
+		One thing to remember, we are fetching data from the Sql database, 
+		so the cursor must be on point 1 , Raghav you did in java to run loop so that pointer or cursor can com on 1st row
+		and fetch data, and same need to do here, so the for loop is mandatory
+			{%for emp in emplyees%} (here employees is key of dictionary which we declared in views)
+				{{emp.id}}
+			{%endfor%}
+		above syntax will be enough		
+		
+----------------------------------------------
+SUPER USER TO RUN ADMIN
+	CREATING SUPER USER TO RUN ADMIN? IN URL
+		so to login in default admin page we need to create super user and it can be done via
+				python manage.py createsuperuser
+			it will ask for name password email etc, you can skip email
+		after then you will able to login in admin, and then you can manage the group and the users 
+
+	REGISTERING site in admin 
+		admin is good tool gto manage the data of model direltly with interface rather then going to sql or mysql
+		it has CRUD property
+			so open admin.py and register the model via below
+					admin.site.register(class name of Model) (before using class in model import that class as well)			
+		
+		normal look feel can be change for admin vali creating class admin.ModelAdmin apnaa parent and just create list
+		and list name must be
+				list_display=[list of name of all]
+				
+------------------------
+Application based URLS
+	simply we will create urls.py in application level,
+	or you can copy the existing one from project level, everything will remain same just delete the admin vala
+	
+	now its time to include the app level url in project level urls
+	so we will simply import include module as well with path module
+	and the body will be like:
+			path('firstapp/',include('firstapp.urls'))
+				
+-------------------------
+JSON usage,
+	all things will be same, creating project , then app, listing app in settings, making templates, listing templates
+	directory in settings, creating views
+		difference is here will will import JsonResponse rather then HttpResponse
+			from django.http import Jsonresponse
+		reset is same will define a function with request paramneter, 
+			below will be the Json code in emp={} inside this 
+		and will return the variable as response
+			return JsonResponse(emp)
+	and last calling the url in url.py
+	
+-------------------------------------------
+SERIALIZERS 
+	Defination: 
+		It is use to convert Object Data or database to the JSON or Client required format\
+		inshort databse to chuk k JSON bnana
+	It provide two types of classes 
+		Serializers and ModelSerializers (we will use ModelSerializer)
+	Working:
+	we will create serializer.py file in our application
+		first we wil import serialzers.py from rest_framework
+		so where this rest_framework comes we need to import it from github via
+			git clone https://github.com/encode/django-rest-framework
+		better to use below pip command to instal djangorestframework
+			py -m pip install djangorestframework
+			
+		if in case not able to load just download the folder from github and unzip in location  python site-package location,
+		and put rest_framework out from the folder (might required other folder out as well)
+		might not work above thing better to install it or get it installed via
+			py -m pip install djangorestframework
+		
+		and then import it via below line 
+			from django_rest_framework.rest_framework import serializers (not required used before when is was wrong check 
+																				class Based Views below for perfect things)
+		
+		once all done dont forget to add rest_framework in settings Installed_APPS
+		
+		Creating Model for serializer
+			We will create model,in models.py  Simply with details , id ,email, name etc
+				 create a class and make parent class models.Model
+					and then rest details
+		
+		Now back to serializer.py
+			and import above model class in serializer.py which we have created
+				from firstapp.models import Info(Model class name)
+			
+			Create class make its parent ModelSerializer via useing serializer.Modelserialzer in parenthesis
+					we will create serialzer with same data which might created duplicacy
+					this is the reason we sometime use ModelSerializer rather then Serializer 
+					just to extends the Model class it helps developers better
+				inside it create Meta class (every variable name must be same as it is as it is predefined)
+					class Meta:
+						(define a variable model and pass the Model class which we have crated in it)
+							model= Info (its model class)
+							fields=[fields name] (all the variable inside Model.py in single commas, 
+													its array declares to restrict the model fields, data enter here only be
+													serialized when we run or save, you can define all or few )
+		
+		Now Views creation time:
+			and import  model class in views.py which we have created
+				from firstapp.models import Info(Model class name)
+				
+			and also import Serialzer class which we have created serializer.py
+				from firstapp.serializer import InfoSerializer
+			
+			and also import Response from rest_framework.response
+				from rest_framework.response import Response
+				
+			and also import status from rest_framework
+			
+			and also import api_view from rest_framework.decorator (will use this app_view to tell the method we are going to	
+																		use in serializer function)
+			
+			use this @api_view([methods list after commas]) before defining function so that django can understand which method
+			you gona use in this function
+				@api_view(['GET','POST'])
+				
+			now create a function with parameter request
+			
+			now we will add If condition like, if requested method is GET, POST or something else
+			before doing that just for reminder if method is GET it means data need to be fetch from Model
+			so we simply Fetch data from model, convert it into serialzer how with class constructor in serialyer
+			with twoo paramters one for the model data which we have get, and other many=True
+			and then return it with Response and serialzer.data as parameter value
+			
+			If the method is POST first we will take the data from URL, as you know post means uploading data in database
+			so taking data drom URL first and then pass to serializer (it will be done in single line of code)
+			then we will check data we recived from URL is valid or not 
+			if yes then save it and return status created
+			if false then return status bad_request
+			
+				If request.method =='GET':
+					info= Info.objects.all() (getting all object from model class) once you get the all data pass to serialzer
+					serializer= InfoSerializer(info,many=true) here parameter info is is the above variable
+					return Response(serializer.data) last thing returning the serialized data via Responseof rest_framework
+					
+				elif request.method=='POST':
+					postSerializer= InfoSerializer(data=request.data) (just getting details from URL and trf to data var)
+					if postSerializer.is_valid():
+						postSerializer.save()
+						return Response(postSerializer.data,status=status.HTTP_201_CREATED)
+					return Response(postSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+					
+			PRIMARY KEY URL CREATNG function to enter the details or handle details update get as per pk primary key
+			do add the above decorator as per GET PUT DELETE as we are going to use them in the views function
+				create a function with parameter request,pk
+					
+					def infoDetailsViews(request,pk)
+					
+				in the body we will enter the code to get the details from the primary key recieved from URL
+				to check if this pk data exists or not in database, all will be done in try except block
+				normally we take all objects from model, this time only data retrive from model with pk> thenc do exception for 
+				user not exist> then return Response not found
+					
+					try:
+						data=InfoModel.object.get(pk=pk)
+					except InfoModel.DoesNotExist:
+						return Response(status=status.HTTP_404_NOT_FOUND)
+				
+				now we will create three conditions if GET POST or DELETE
+					GET same as above (no need for variable it is defined in try catch user it)
+					PUT body 	
+						elif request.metod=='PUT':
+							idwPUTserializer=InfoSerializer(dataFromIDW,data=request.data)
+							if idwPUTserializer.is_valid():
+								idwPUTserializer.save()
+								return Response(idwPUTserializer.data)
+							return Response(idwPUTserializer.errors,status=status.HTTP_400_BAD_REQUEST)
+					DELETE body
+						elif request.method=='DELETE':
+							dataFromIDW.delete()
+							return Response(status=status.HTTP_204_NO_CONTENT)		
+
+		Now time to adding views in URL, we will add fucntion lets go to app URLS.py
+			as we have created two views function, so will two path for URL
+			one will be done normally
+			for other who have GET PUT DELETE for PK main is PK primary key we have to put the PK in URL
+				path('infoList/<int:pk>',views.infoSeriDetailsViews)
+		
+		Thats all, Now need to TEST our Views and get, Post put  , it can be simply be  done by the site
+		just open the site which we have created you will see a perfect framework created by RestFramework, and just 
+		make the changes test and check all your POST, PUT DElete GET are working fine or not
+		
+		In that screen you will see the data coming from Sqlite database with the rest framework.
+		you cand use DLETE get option via primary key 
+		
+		
+--------------------------------------------------------------------------
+CLASS BASED VIEWS
+	Create Project do above things,
+	create App
+		install djangorestframework
+		add both rest_framework and application name in the settings.py INSTALLED_APPS
+		setting the directort or BASE_DIR in settings.py (check above things)
+		for templates as well
+	create model 
+	create serializer
+	
+			
 Django is based on MVT, (Model View Template design pattern)
 
 Q&A
@@ -201,5 +524,10 @@ Q&A
 	Q3: Which of the following in MVT is responsible for doing the Database Work
 	Ans: Model
 	
+	
+	 
+	
+
+
 
 Note: first do the Commit & push via UI and then run this git commit -m "First commit" hit enter this will comit and to push use this "git push"
