@@ -215,6 +215,7 @@ MODEL CREATION AND LEARNING TIME
 		create project:
 		configure database
 		create model class
+		Register it in Admin
 		make migration > Migrate
 		Use the model in view
 			
@@ -304,6 +305,13 @@ MODEL CREATION AND LEARNING TIME
 			{%endfor%}
 		above syntax will be enough		
 		
+	def __str___():
+		In model class some time we define this thing , actually override it, so reason is to show the name in site appear in DRF restframe work, 
+		we will return any variable we have just created in the Model class
+				return self.employee
+				
+NOTE: whenever you create a model class and want to see it in admin panel you first have to register it in admin.py and onl then it will appear in Admin DRF website ok
+		
 ----------------------------------------------
 SUPER USER TO RUN ADMIN
 	CREATING SUPER USER TO RUN ADMIN? IN URL
@@ -313,7 +321,7 @@ SUPER USER TO RUN ADMIN
 		after then you will able to login in admin, and then you can manage the group and the users 
 
 	REGISTERING site in admin 
-		admin is good tool gto manage the data of model direltly with interface rather then going to sql or mysql
+		admin is good tool to manage the data of model direltly with interface rather then going to sql or mysql
 		it has CRUD property
 			so open admin.py and register the model via below
 					admin.site.register(class name of Model) (before using class in model import that class as well)			
@@ -351,6 +359,39 @@ SERIALIZERS
 		inshort databse to chuk k JSON bnana
 	It provide two types of classes 
 		Serializers and ModelSerializers (we will use ModelSerializer)
+		
+	SERIALIZER: First we will learn About Serialzers:
+		in serializers we will take all the variables defined in the Model , 
+		and do same as the we defined in Model but via serializers
+			Example:
+						id=serializers.IntergerField(read_only=True)
+						name=serializers.CharField()
+		
+		To handle the code for PUT view we need to define a function inside our class is create
+						def create(self, validated_data): (validated_data carries the new values)
+							return Movie.objects.create(**validated_data)
+		For Update will do same thing 
+						def update(self,instance ,validated_data): (instance carries old values and validated_data carries new values)
+				once function is created new need to pass the New data from validated_data to old instance data
+						instane.name=validated_data.name('name', instance.name) (here name is the variable name and instance.name is just to define Old name)
+						
+		
+		Now Go to Views:
+			Create class, with parent class APIViews or create dunction with request in parenthesis
+				define the variable model and pass the Model object
+						movie=Movie.object.all() (Movie is the Model class name which we have defined or going to deine)
+				
+				now define the variable serializer and make the conversion of model to serializer and pass to the variable
+						serializer= MovieSerializer(movie, many=True) (MovieSerializer is the Serializer class name of serializer and movie is the defined variable), (many=True is defined when we need to get teh multiple Object form server)
+						
+				Thats all now return the response all serializer data
+						return Response(serializer.data)
+		
+		For FUNCTION BASED VIEWS we will import the @api_view decorator 
+					@api_view() or @api_view('GET') or @api_view('GET','POST')
+					
+						
+		
 	Working:
 	we will create serializer.py file in our application
 		first we wil import serialzers.py from rest_framework
@@ -359,18 +400,20 @@ SERIALIZERS
 		better to use below pip command to instal djangorestframework
 			py -m pip install djangorestframework
 			
-		if in case not able to load just download the folder from github and unzip in location  python site-package location,
-		and put rest_framework out from the folder (might required other folder out as well)
-		might not work above thing better to install it or get it installed via
-			py -m pip install djangorestframework
-		
-		and then import it via below line 
-			from django_rest_framework.rest_framework import serializers (not required used before when is was wrong check 
+						if in case not able to load just download the folder from github and unzip in location  python site-package location,
+						and put rest_framework out from the folder (might required other folder out as well)
+						might not work above thing better to install it or get it installed via
+							py -m pip install djangorestframework
+						
+						and then import it via below line 
+							from django_rest_framework.rest_framework import serializers (not required used before when is was wrong check 
 																				class Based Views below for perfect things)
 		
 		once all done dont forget to add rest_framework in settings Installed_APPS
 		
-		Creating Model for serializer
+		MODEL SERIALIZER:
+		
+			Creating Model for serializer
 			We will create model,in models.py  Simply with details , id ,email, name etc
 				 create a class and make parent class models.Model
 					and then rest details
@@ -379,7 +422,7 @@ SERIALIZERS
 			and import above model class in serializer.py which we have created
 				from firstapp.models import Info(Model class name)
 			
-			Create class make its parent ModelSerializer via useing serializer.Modelserialzer in parenthesis
+			Create class make its parent ModelSerializer via using serializer.Modelserialzer in parenthesis
 					we will create serialzer with same data which might created duplicacy
 					this is the reason we sometime use ModelSerializer rather then Serializer 
 					just to extends the Model class it helps developers better
@@ -390,6 +433,12 @@ SERIALIZERS
 							fields=[fields name] (all the variable inside Model.py in single commas, 
 													its array declares to restrict the model fields, data enter here only be
 													serialized when we run or save, you can define all or few )
+													
+							(You can also use "__all__" and it includes all the fields in model
+							and if you have multiple fields you can use 
+										exclude=[name of fields]
+							it will exclude the fields defined and take rest other fields		
+								
 		
 		Now Views creation time:
 			and import  model class in views.py which we have created
@@ -456,6 +505,7 @@ SERIALIZERS
 					GET same as above (no need for variable it is defined in try catch user it)
 					PUT body 	
 						elif request.metod=='PUT':
+							movie= Movie.Objects.get(pk=pk) (just to define which object we are going to update else it will create the new object rather than updating the current exisying object)
 							idwPUTserializer=InfoSerializer(dataFromIDW,data=request.data)
 							if idwPUTserializer.is_valid():
 								idwPUTserializer.save()
@@ -463,9 +513,10 @@ SERIALIZERS
 							return Response(idwPUTserializer.errors,status=status.HTTP_400_BAD_REQUEST)
 					DELETE body
 						elif request.method=='DELETE':
+							movie= Movie.Objects.get(pk=pk)
 							dataFromIDW.delete()
 							return Response(status=status.HTTP_204_NO_CONTENT)		
-
+ 
 		Now time to adding views in URL, we will add fucntion lets go to app URLS.py
 			as we have created two views function, so will two path for URL
 			one will be done normally
@@ -477,10 +528,79 @@ SERIALIZERS
 		make the changes test and check all your POST, PUT DElete GET are working fine or not
 		
 		In that screen you will see the data coming from Sqlite database with the rest framework.
-		you cand use DLETE get option via primary key 
+		you cand use DLETE get option via primary key
+	
+	CUSTOM SERIALIZER FIELDS:
+		incase you want to create the field to be appeared in data just for test purpose so rather then creating the new field in the Model and defining all the details you can simply create the field in the Serializer , it will help you to avoid the lot of work
 		
+		HOW to DO IT:
+			simply in the serializer class(above the META class) define the variable name with serializers.SerializerMethodField()
+					len_name= serializers.SerializerMethodField()
+					
+			once decleration is done to get it workf we need to create a function as the SerializerMethodFieldwill call some function
+			and by default it wil call get_nameOfField (whatever we have given in this case its len_name) so function name will be
+					def get_len_name(self,object): (object store all the fields name)
+						return len(object.name)
+---------------------------------		
+VALIDATION:
+	Three type of validation: Field Level, Object Level, Validator
+	We will add this validation in Serializer.py inside its class there will be function,
+	
+	Field-Level Validators: so we are adding validation on a single field like Name, or description, or any defined variable serializer class
+		and that Function is defined use same, validate_name(self,value) (here the word name will teh field name which need to be changed and the value to get the value which you will get)
+					def validate_name(self,value):
+						if len(value)<2:
+							raise serializer.ValidationError("Name is too short")
+						else:
+							return value
+							
+	OBJECT LEVEL VALIDATION: 
+		we will use def validate (self, data) (by validate we means we are going to apply validation on Object, )
+					
+					def validate(self, data):
+						if data['name']==data['description']: (here name and the description are the variable name declared in serializer)
+							raise serializer.ValidationError("Cannot be same")
+						return data
+						
+	VALIDATORS:
+		validator is argument which need to be passed to our Current page, 
+		first we need to defile the validator class in the field while decearing the variable in serializer
+				Eg. name=serializer.CharField(validators=[name_length])  (here the name_length will be the function which we are going to define to perform some logic)
+				
+				def name_length(value):
+					if len(value)<2:
+						raise ValidationError("name is too short")
+						
+			This function will be defined out of the class scope
+			
+	
+FOR Model Serializer you have to define all inside the Class, first create the class and then Meta class and with same scope of Meta class do define all the validation 
+
+MaxValueValidator and MinValueValidator
+	from dajngo.core.validator import MaxValueValidator, MinValueValidator
+	
+	order=models.PositivieIntergerField(validators=[MaxValueValidator(100), MinValueValidator(1)]
+					
 		
 --------------------------------------------------------------------------
+SERIALIZER VARIABLE:
+	here we will define how to create the variable and why
+		simple in the serialzer class define the variable in same way we do in model
+	
+			password2= serializer.CharField(style={'input_type':'password'},write_only=True)
+		
+		the above code snipt is doing creating additional field rather than the fields defined in model
+		and its password field just to guide you how Password field should be
+		must be write only access and style must be password * vala
+		
+NOW IF YOU NEED TO MAKE THE SOME VARIABLE CHANGES IN THE SERIALIZER WHICH IS CREATED IN MODELS
+	simply define it in extra_kwargs={}
+	so as wel now in serializer there is class meta with default field, model and fields and now we will add one other field
+			extra_kwargs={
+				'password':{'write_only':True}
+			}
+	here password is the field defined in the models and we just add the extra style which we have not added on time of model creation
+---------------------------------------------------------
 CLASS BASED VIEWS
 	Create Project do above things,
 	create App
@@ -490,8 +610,620 @@ CLASS BASED VIEWS
 		for templates as well
 	create model 
 	create serializer
+	creat urls
 	
+	Actually I MASTERD this thing without Documntation so simply gonna write what i know, 
+	
+	ok so its is same as function based views difference in class based views we user APIViews as parameter
+			class firstView(APIViews):
+				def get(self, request):
+					#body
+					return Response('bla bla bla')
+		
+		so it is same as function based thing is here we dont use the deciorators we will only use the function
+		and the functions are defined so we will overide it
+		def get(self,request), def post(self,request), def put(self,request, pk), def delete(self,request, pk)	
+		
+	in function based we are using If request.method=='GET' etc etc
+	here will use the function overided
+	and thats all,
+	other difference is we use APIview not decorators lik @api_views
+	and in URL py for the class based
+	
+		we will import the Class from views one by one
+		and will make path as , as_views()
+			path['endpoint/',className.as_view()]
+		only then it will work, where in function based views we only enter the view function name
+------------------------------------------------
+GENREIC VIEWS GenericAPIView:
+	generic views just short down the work done in APIViews its APIViews replacemnet with mixins and generic
+	we don need to write each view things , we will user queryset and serializer_class,
+	mixins need to be imported from 
+	generic need to be import: from rest_framework import generics , mixins
+	EXAMPLE:
+			class Employee(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView): 
+				queryset= SubjectModel.object.all() (model need to be passed to queryset)
+				serializer_class=SybjectSerializer  (pass the serilaizer class t serializer_class)
+				
+				def get(self, request, *args, **kwargs):
+					return self.list(request,*args, **kwargs)
+					
+				def post(self, request, *args, **kwargs):
+					return self.create(request,*args, **kwargs)
+					
+	To get the single Model to be fethed we will use the retrieve method of mixins
+			class Employee(mixins.RetrieveModleMixin, generics.GenericAPIView): 
+				queryset= SubjectModel.object.all() (model need to be passed to queryset)
+				serializer_class=SybjectSerializer  (pass the serilaizer class t serializer_class)
+				
+				def get(self, request, *args, **kwargs):
+					return self.retrieve(request,*args, **kwargs)
+--------------------------------------------
+CONCRETE VIEW CLASSES:
+	first we use APIViews class and define get pots etc methods to get it work, 
+	to reduce it we shifted to GenericAPIView where we only define the queryset and serializer_class with get post function
+	and now moving to vconcerete class where  we only define the queryset and serializer_class
+	
+	in the backend it is performing all the things but we ponly need to do that simple, not so lengthy codejust 
+	make parent class,
+	
+					class Employee(generic.ListCreateAPIView):
+						queryset= SubjectModel.object.all() 
+						serializer_class=SybjectSerializer  
+						
+	Thats all done
+	ListCreateAPIView: it will give the list of everything 
+	RetrieveUpdateDestroyAPIView: and if you want to access particular <int:pk> the use RetrieveUpdateDestroyAPIView
+	
+-------------------
+MODEL VIEW SET	:
+		More shot version, you will have everything like delet, post, put update
+		just import it and inhertit viewsets.ModelViewSet and thst all then define the queryset and serializer_class
+		finish 
+--------------------------------------------
+RELATIONS in DRF
+	ForeignKey usage:
+		in model we can create a foreign with relation to other class in model.py
+		like we have created a class Platform and then other class Videos (now we want that while getting the Platform details we also get
+		details and name about the Videos inside that platform which is actuallyin other class) to do that
+		
+		in video class we will create the object with foreignKey for platform in models.py
+				video=models.foreignkey(Platform, on_delete=models.CASCADE, related_name='watchlist')
+			CASCADE doing is when the channel is deleted all the video inside cahnnel will be deleted
+			related_name is the name which we will use in the area in serializers.py class which will tell where to show the nested data
 			
+		Now what this foreign Key did? it just created Many to One relationship Django relationship
+	
+	PRACTICE: is sy jyada smj aayega
+		creating a new Class Review, and as i know, review will child and parent will be movie
+		now how to create relation, simply via foreign key, so that when someone get the Movie data, Review will appear in sub folder , 
+		related_name:now sub_folder must have name it will be look b related_name field in foreign key,
+		on_delete=models.CASCADE: it will do when the movie deleted so there is no meaning of review , so             all review	will be deleted
+		
+		Same way we will add the foreign Key in review class which we have created and will related with Videos
+		
+		NOW above this is only use to create the relation, now we also want to show the data and how it will work via below Nested 
+		Serializer
+	----------------------------------------------------------------------------------------------	
+	NESTED SERIALIZERS: read above DRF as well for foreigion term usage and understanding
+			everything in serializer.py remain same while creating the class,
+			main differense is:
+				when you create a relation Model what you did is created foreign class inside the Class which need to relate , like video need to relate with platform so foreignKey created in Videos and related with Platform
+				
+				in same way we have created review class and it need to relate with Videos and we created the foreign key in review class and relate with Video
+				
+				now difference here will be we write the additional line "related_name variable" in related class not in the smae class, like Video serializer remain same, and the variable will be defined in Platform serializer
+				
+			one serializer class is created, Video Serializer is already created and one more now created second one here PlatformSerializer we will add the variable here in Platform (because Platform k sath relation bnaya h humne, foreignkey was created in Videos Model .... bla bla u know)
+			in above we have added related_name , define same name as class variable
+				watchlist=VideoSerializer(many=True, read_only=True)
+				class Meta:
+					model=Platform
+					fields=__all__
+					
+			REMEMBER: watchlist variable is same name as defined in foreigionkey in model related_name
+			
+			EXPLANATION: Whats the Idea it is Once we have created relation between two classes, each class show its own data, but we want that the Platform shows all its videos in list when we get all platforms
+			
+			before when we get all Platforms we see only platform details but now we will see Videos on that platform as well
+			
+	NOTE: it will eturn all the field in the model call, if we need specifi field we will use below Serializer Relation
+	--------------------------------------------------------------------------------------------------------------------------------
+	Serializer Relation:
+		better to check with Guide, for serializer relation
+			all need to change the name like PrimaryKey, StringRelated Field etc you will find in DRF site
+	----------------------------------------------------
+	HYPER LINKED SERIALIZERS
+		concept to generate the ID as the link, or any field as link, 
+		 to get the ID as link, just use the HyperLinkedModelSerializer as parent instead of ModelSerializer
+		 adn where you are converting to model data to serilizer  in view line add extra after many=True
+		 context={request=request} something like this not sure just check in the Document site of DRF
+	 
+	PURE PRACTICE for RELATION:
+		so now in my inventory need to create the relation , steps need to be done:
+			1: Create a Model class and define the fields,and then define the ForeignKey field,
+				requirement=models.Foreigionkey(Class name, on_delete=CASCADE, related_name="")
+			2: done now need to create the relation serializer, here the catch is relation ship will no define in the new class created 
+				in serializer, We will define the relation in the class related to it, 
+					Example: B is related to A, so we will create the new class B and define that B class inside ADD
+			3:  create the class in serialzer and do basics Class Meta: etc (class must be created in top of the related class)
+			4:  go to the class A and define the class B
+				 while defining the field name it must be same as the related name in the Model,
+					orders=A(many=True, read_only=True)
+	
+-----------------------------------------------------------------------------------------
+NOTE DOWN THE USER NAME WHO ADD DETAILS: (but this works only for the admin view addition
+
+	1. Import User in models.py
+			from django.contrib.auth.models import User
+	2.now make a new field as foreignKey and add the User model as foreignKey
+			userName= models.Foreigionkey(User,on_delete=CASCADE)
+	3.now store the same field in the serilizer.py class same Review serializer
+			userName= serializer.StringRelatedField(read_only=True)
+	4. and in view.py must define the class with generic.CreateAPIView as parent
+		assign serializer_class= class name of serializer
+	5. def fucntion with self and serializer as argument
+	6. define variable pk and the the data from the pk 	
+			self.kwarg.get('pk')
+	7. get the data from model object and stored in variable
+			video= VideoModel.objects.get(pk=pk)
+	8.and save the serializer and as argument pass the modeldata foreignkey of the class and the user name 
+			serializer.save(forVideo=video,) (forVideo is the define in model.py and video is variable define in this function to get the 
+													primary key data)
+	9. and run		
+------------------------------------------------------
+CHECKING IF THE DETAILS IS FILLED BY ALREADY VIA ONE USER HE MUST NOT ABLE TO DO IT AGAIN (needs to be improved)
+	
+	inside the views.py same where we have define the above , simply ass the below steps before saving the serializer
+	1. in views.py get the user name:
+			user=self.request.user
+	2. get the queryset , normal make the filter if the user has the same data
+			query=Review.objects.filter(forVideo=video, userName=getUser ) (forVideo and userNAme is the variable define in the models.py)
+	3. now you have filter out the data, like above will check if the filter returns something or blank
+	4. now check via if confirtion using exists()
+			if query.exists():
+				raise ValidationError("Its alreday Exist") import the ValidationError from rest_framework.exception
+	5. save the serializer and as argument pass the modeldata foreignkey of the class and in addition username as well
+			serializer.save(forVideo=video, review_user=user)
+	5. thats all now try to run and check 
+	
+
+-------------------------------
+PERMISSIONS:
+	first we will add the REST_FRAMEWORK in settings.py just to tell we have the permissions enabled and going to use
+			REST_FRAMEWORK = {
+				'DEFAULT_PERMISSION_CLASSES': [
+					'rest_framework.permissions.IsAuthenticated',
+				]
+			}
+	now the thing is IsAuthenticated is one example  there are many other like
+	AlowAny, IsAdminUSer , IsAuthenticatedOrReadOnly etc
+	
+	so gonna use all, because in exam i gota ask question only on this thing, and i fucking ruined it
+	
+	so when you add the above program in the settings so every thing will be locked and ask you to login
+	in admin and then the access will work, else you will get error
+	
+Doing Views code for permissions
+	so what need to set the particular view class permissions?, all we need is to add the below line:
+				permission_classes=[IsAuthenticated]
+			this example for the Class based Views, and 
+			for functions based views we will use permissions decorator in top of function:
+				@permission_classes([IsAuthenticated])
+	remmember we will remove the permissions from settings.py as this settings will act global,
+	if you need global then ok, else remove it
+------------------------------------
+CUSTOM PERMISSIONS:
+	main thing, here we are going to create our own permissions, actually classes
+	like i will create a class and apply the rule,
+	
+	let me ask you do you know how these permissions are actually working in views?
+	Answer is permission_classes check the permission if they return true then res. further code is executed
+	else it is throw the exception, so same way we will set the permission
+	
+	while setting the custom permission we will always return bool, so that we can check if they have the particular access or not
+	
+	
+	now code time:
+			so we will create a file name permissions.py in application
+				here we will import thr permissions from rest_frmaework
+				now create class with parameter permission type, example permissions.IsAdminUSer or
+				permissions.Basepermissions etc
+				
+				you select anyone as per requirements
+				
+				Lets create two type of Authentication, one if its Admin then can edit else view
+				and other if the login user is review user then can edit else view(like raghav cant edit chirag, but can edit Raghav)
+				
+				for admin only
+					i will create class and inherit with IsAdminUSer class
+						class AdminOrReadOnly(permissions.IsAdminUser):
+					now define function, has_permissions(self, request, view)
+						def has_permissions(self, request,view):
+					below wiil be the body of function, 
+							if request.method permissions .SAFE_METHODS:
+								return True
+							else:
+								return bool(request.user and request.user.is_staf)
+					explanin, here i am checking if the method is GET, somone trying to get the info then go get it
+					hence returning true
+					If someone want to update it? run else, and check if he is admin, only admin can make changes
+					
+				Now creating other permission is the persion try to update is reviewer it self, or creator
+				for the in the information we already has set the reviewer name so that we can verify with login person
+				like the information login person has get is the same person updating the information not the differnet one, raghav chirag vala case like above mentioned
+				
+				so here the code goes, thing will remain same, 
+				creating class	with BasePermission parameters as we are checking the reviewer not the admin
+						class ReviewerOrReadOnly(permissions.BasePermission):
+							def has_object_permission(self, request, view, obj):
+								if request.methodnin permissions.SAFE_MODE
+									return True
+								else:
+									return(obj.reviewer==request.user)
+				
+				Explanation: here we need the data from object to check detaisl so taking the object function
+				returning yes if its GET method, else checking the obj.reviewer name is same as request.user which means is it same as the login person
+				obj.reviewer returing name insisde the Model information stored in server
+				adn request.user is returning the loginid name of the current user login
+				if both are same then he can update is data else he cant
+		NOTE: has_object_permission will only be called if using generic API, then default call will occure else you have to call exciplitly via check_object_permission(self, object) (and i dont know how to do it ) so we will go with GENERIC API
+--------------------------------------		
+GENERIC VIEWS:
+	REASON for learning this Generic API: is below in permission cases has_object_permissions will only by default called if you have created Generic API, in normal API you have to call it explicitly and i dont know how to do that
+	
+	
+-------------------------------
+TEMPERORY   IN DRF
+	No special thing all we need to do is add path in the project url with link api-auth and include restframework.urls
+		path('api-auth',include('rest_framework.urls')
+				
+---------------------------------------------------------------------------
+TOKEN AUTHENTICATION aading in application
+	so token in DRF is one time token, once created it is created,
+	going to working directly 
+		in settings.py we will add
+				'rest_framework.authentication.TokenAuthentication'
+			it will be added inside the REST_FRAMEWORK{} dectionary key as 'DEFAULT_AUTHENTIACTION_CLASSES': and value is ist [] obove one
+			
+--	And also need to add the 'rest_framework.authtoken' in INSTALLED_APPS, 
+	and then we will migrate t so that new installed app can be worked and synced with DRF and show the Token field in admin panel
+
+--	URLS part
+		add the path
+			path['login/',obtain_auth_token]
+		we have to import it from the reset_framework.authtoken.views import obtain_auth_token
+	
+--	GENERATING TOKEN AFTER ADDING USER
+	Ok all done now open the Admin login in django rest you will see the Token name , add the token for users via clicking add token adn token will be genrated for the selected user
+	
+	OR
+	
+	to get token from Postman, open the postman, go to the Body and Form data and enter the
+	this will be the POST for login url end point
+		Key                      Value
+		username				Raghav
+		password                Raghav@22
+	
+	remember username and password is the default field in the User Model , 
+	
+	NOW CHECKING WITH POSTMAN:(not worked)
+		Open the postman, and then in the URL link enter your Local link
+		once done now time to check the authentication:
+			as you have put the Authentication, so data will not be work as we need login authentication and how do we check in postman?
+				Simply open Header tab,
+					in Key enter the key as Authorization
+					and value will be Token hscnijodnnkjcb (its token ID)		
+				and boom it will work now
+	
+	JUST for basic authentiacation:
+		key: Authentication
+		Value: Basic username:password in base64 encoded
+		
+-- GETTING TOKEN FROM POSTMAN RATHER THEN FROM THE DRF ADMIN LOGIN:
+	one is setting the path in urls.py
+	second step is calling the token from postman
+		in the Python URL you need to import the obtain_auth_token from rest_framework.authtoken.views
+			and then set the path
+				path('login/',obtain_auth_token,name='login')
+				
+	all done with the url part 
+	
+	--now open the POSTMAN
+	go to Body tab, enter the key username bydefault django took username not email
+		Key: username and Value is: name of user  user
+		Key: password and Value password of the  user
+	both Key need to be enter and then change to Post enter the URl link set in path and boom post
+	all done you will get the token in your POSTMAN
+
+-------------------------------------------------	
+CREATING NEW USER in User Model , (this model is by defalut provided by the DRF where all user data is stored super user wala)
+
+	Learning in this Segment
+		Here we will learn registering the user/creating new user, 
+		checking password twice if he enter password and confirm password is same
+		Checking if the user he entere the email already stored by someone
+	And all this be done in serializer.py file 
+		Additionaly:
+			We will create the new field in serializer which is not stored in the Model
+			Adding the style for the field which is already created in teh Model but we havenot defined or mentioned while creating fiel
+	
+--	Lets Start:
+		Structure of this app is:
+			models>serializer>views>urls
+		
+-- Strating From MODEL
+		we dont need to create the model as we are going to use default model Users
+		
+--	Serializer Time:	
+	in serializer import User Model 
+			from django.contrib.auth.models import User
+	
+	now our main task is to check the password and confirm password so we will create a variable in the serializer class password2
+		password2= serializer.CharField(style={'input_type':'password'},write_only=True)
+		now define the Class Meta: withe model and field variable , this time introducing new concept how to add field desing in already
+			created field in model, for that we will user extra_kwargs variable inside class meta, it hold the all fields created in Model
+					extra_kwargs={
+						'password':{'write_only':True}
+					}
+			its dectionary hold all the fields defined in the Models.py
+	
+		we have to save the serializer in views.py (obviously) so it is going to run the save method, when it runs 
+		the save method and it will check and run Object.create method becuase we have create the new field
+		password2 and with write_only as true so we need to define it and maintain it, 
+		
+		we will override the save method and we are doing so we will do other validation check in same part
+		**save Method is override outside the Class Meta scope
+		1.Password and password2 checking 
+		2.Email user going to add must not be added for another user
+			
+			def save(self):
+				#get the password which is getting post using validated_data
+				password= self.validated_data['password']
+				#get password two
+				password2= self.validated_data['password2']
+				#now check both are same
+				if password != password2:
+					#raise the ValidatioError dictionary
+					raise serializer.ValidatioError({'error':'p1 and p2 must be same'})
+					
+				#now checking if the mail enter is not exist, not used by any other user
+				#it will get from the Model User as we are getting already stored data and filter it
+				email=User.objects.filter(email=self.validated_data['email'])
+				#now check if it exists
+					if email.exists():
+						raise serializer.validationError({'email':'Email already exists'})
+				
+				#now all validation is checked it's time to save those details the main purpose was to save the 
+				details
+				#now we have to save the data in database of user, so we will get the User details and then save
+				the password set_password function
+				account=User(email=self.validate_data['email'], username=self.validate_data['username']
+				account.set_password(password)
+				account.save()
+				
+				return account()
+				
+				
+		
+--	Now Coming to Views.py so we need to add the user so we will use the POST, this time lets impliment the POST function
+	and we need decorators api_view , we will get the decorators from rest_framework.deciorators import api_views
+	
+		@api_view(['POST',])
+		def resgitrationView(request)
+			if request.method=="POST":
+				serializer=RegistrationSerializer(data=request.data)
+				if serializer.is_valid():
+					serializer.save()
+					return Response(serializer.data())
+					
+--	Coming to urls.py
+		so we need to generate the token as well for that we will use obtain_auth_token and it will be imported 
+			from rest_framework.authtoken.views import obtain_auth_token
+		Import the View which we have created above
+			and enter it in 
+				urlpatterns=[
+					path('register/',view_name)
+				]
+			
+		
+--	Coming to POSTMAN
+		So we are going to add the user details in the fields declared in the Serializer
+			so we will add the link of the uRL and 
+			then do to Body and form-data
+				in Key enter the fields name ione by one and th value enter the value which need to be added	
+---------------------------------------------	
+TOKEN CREATION POST SAVING:
+	in previous we are creating the user and then we are creating token separately
+	now we are going to both things at single go
+	
+	what we need? first a model to store the token data
+	and then in views part we will define a dictionary as it need to be passed
+	
+--  in models.py
+		we will simply copy paste it from the documenttaion for Authnetication TOKEN
+			from django.conf import settings
+			from django.db.models.signals import post_save
+			from django.dispatch import receiver
+			from rest_framework.authtoken.models import Token
+
+			@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+			def create_auth_token(sender, instance=None, created=False, **kwargs):
+				if created:
+					Token.objects.create(user=instance)
+					
+--	in views.py
+		import the model package directly, reason we have made the function there not the 
+		import your serializer
+		from rest_framework.authtoken.model import Token
+		
+		@api_view(['POST'])
+		def register_view(request):
+		
+			if request.method=='POST':
+				serializer= RegisterSerializer(data=request.data)
+				#create new dictionary where we will add name password , so that we can get the token
+				data={}
+				if serializer.is_valid():
+					account=serializer.save() #returning save data,cz we have overided the save in serailiser and returning validated data
+					#creating the token with below line:
+					token=Token.object.get_or_create(user=account).key
+					#adding the dictionary data just to get the details what we have created 
+					data['response']='Registration Successful'
+					data['username']=account.username
+					data['email']=account.email
+					data['token']=token
+				else:
+					data=serializer.error
+				
+			return Response(data)
+
+--	urls m save kro apna view link nad then carry on with postman
+		same link for Post, and in Body , form data enter the key and values, 
+		key will be all the fields in serializer and value that user values
+		
+		Key				Value
+		username		Raghav
+		email			raghav@gmail.com
+		pasword			Raghav@22
+		password2		Raghav@22
+	
+*So now register user got logedin directly and , after registration no need to login again for token creation, once login 
+	obtain_aut_token will work				
+------------------------------------
+TOKEN DELETION				
+	simpliy, we will create the function in views.py
+	
+	@api_view(['POST'])
+	def logout_view(request):
+		if request.method=='POST':
+			request.user.auth_token.delete()
+			return Response(status=status.HTTP_200_OK)
+	
+--	add the url in urls.python
+
+--	Postman
+		add the Link for Post same as urls.py
+		and then header , 
+		key will be Authorization and value is Token msdbcjkdfhuksdb (token code of user)
+		
+		
+		
+NOTE: for the Login field, we will use the Body in postman
+		sand for the deletion of token we will use Header with token
+--------------------------
+JWT AUTH TOKEN:
+	install the simpletjwt token, 
+	read documentation from the site rest-framework-simpletjwt-token
+	
+	enter settings.py part (inside the REST_FRAMEWORK in DEFAULT_AUTHENTIACTION_CLASSES there we will mention)
+	
+	enter urls.py part: here we will add the rest_framework_simplejwt import TokenObtainPairView, TokenRefreshView
+	and then add there path :
+			path('api/token/',TokenObtainPairView.as_view()),
+			path('api/token/refresh',TokenRefreshView.ad_view())
+			
+	now  path('api/token/',TokenObtainPairView.as_view()), this URL is used to generate the token both refresh 
+		and the access, and for that we will use POSTMAN cant dirctly generate or use the Browser
+		and for this token generation, we will enter the details in:
+				Body,
+					Key           value 
+					username      Raghav
+					password      Raghav@22
+		
+		thats done, it will create the token for the user Raghav
+	now how to use it, we will open anothe postman tab in Post and then go to Header and use the Bearer for token
+				Header,
+					Key                value 
+					Authorization      Bearer dbvfdvjahfhbahsbvyvb34qt74gyfg784
+					
+	now how to use refresh token to get the access token again for that we will use:
+		path('api/token/refresh',TokenRefreshView.ad_view()) this url
+		open the new tab for POSTMAN and there enter the vaue in Body tab
+					Body,
+					Key           value 
+					refresh      refresh_wala_token
+		and boom you will get the new access token actually same one
+		
+	now we want rather then manual constructicting access token again and again we will construct automatically
+		via using 'ROTATE_REFRESH_TOKEN
+	so whenever JWT token is created it is created two token one is 
+	Refresh Token: stays for 24 hours and user to develop the access token
+	Access Token:  It expired in 5 minutes, but refresh token can generate the new one, for that we need to keep it true
+					in settings.py using below code
+							
+							SIMPLE_JWT={
+								'ROTATE_REFRESH_TOKEN'=True,
+							}
+							
+--	Getting Token from JWT, 
+		in old version we was using the Token model to get the token
+		via:
+			token=Token.objects.get_or_create(user=account) #account hold the serailiser.save() information
+		which mainly returns username password so we need to define/overload the def save(self) in serializer
+		
+		Basically we need the the details to get the token, mainly username or password, 
+		so above account contains the userName
+		
+		in jwt we will use documentataion, 
+				refresh=RefreshToken.for_user(account)
+				
+		it generated the token before that import it from rest_framework_simplejwt.tokens import RefreshToken
+		
+		now need to add the token in the data['token']
+		you know data is just the variable we have created in the class as dictionary variable which will help
+		in storing the data and reqturn the same dictionary data
+		
+		data[token]={
+			'refresh': str(refresh),
+			'access': str(refresh.access_token),
+		}
+		
+		here we are returing the dictionary to dictionary
+
+By default access Token Time is 5 minutes, and the refresh token time is 10 minutes,
+so you can also change it , all you need is to follow the steps in the JWT authentiacation documentation and it 
+will work,just study and give a go
+------------------------
+THROTTLING:
+	This concept is same as the Permission, the difference is that it will restrtict the API count , like the request coming to the API from user end must nbe in limit
+	
+	need to add in the settings REST_FRAMEWORK
+	
+		REST_FRAMEWORK = {
+			'DEFAULT_THROTTLE_CLASSES': [
+				'rest_framework.throttling.AnonRateThrottle',
+				'rest_framework.throttling.UserRateThrottle'
+			],
+			'DEFAULT_THROTTLE_RATES': {
+				'anon': '100/day',
+				'user': '1000/day'
+			}
+		}
+		
+AnnoRateThrottle is for the Anonymous user , not registered in our site
+and 
+UserRateThrottle is for the registered user
+
+-- View based throttling, 
+		as the above statement is used for the complete throttling, for user based throtking we will removet the 
+		DEFAULT_THROTTLE_CLASSES and then add the below
+
+in the view we will use the same procedure for the permission_classes same 
+	import rest_framework.throttling  import UserRateThrottle, AnnoRateThrottle
+		throttle_classes= [UserRateThrottle]
+		
+we can change the request count for hours , minutes , seconds etc
+
+----------------------
+ERROR LIST:
+Error: no such table: Inventory_shopitemsmodel
+Solution: python manage.py migrate --run-syncdb 
+			run this command it will only work if you have created table but not synced
+			
+Error: NOT NULL constraint failed: Inventory_reviewmodel.userName_id
+			this means some value while posting is null
+---------------------------------------------------------------
 Django is based on MVT, (Model View Template design pattern)
 
 Q&A
@@ -523,6 +1255,14 @@ Q&A
 	
 	Q3: Which of the following in MVT is responsible for doing the Database Work
 	Ans: Model
+	
+INTERVIEW Question:
+	Q1: Difference between WEB API and normal web application
+	Ans: Key difference is both use different way to communicate with easch other,
+		WEB Application return/render HTML data, while Rest API designed to exchange data in JSON, they dont render html
+		
+	Q2: benifits of using Django rest framework
+	Ans: 
 	
 	
 	 
